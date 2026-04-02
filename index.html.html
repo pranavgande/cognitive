@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cognitive Rebuild — Premium Daily OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#050814;
+      --bg2:#0a1020;
+      --panel:rgba(12,18,34,.68);
+      --panel-2:rgba(255,255,255,.04);
+      --stroke:rgba(255,255,255,.08);
+      --stroke-strong:rgba(255,255,255,.14);
+      --text:#f5f7ff;
+      --muted:rgba(245,247,255,.64);
+      --muted-2:rgba(245,247,255,.42);
+      --accent:#8b5cf6;
+      --accent-2:#22d3ee;
+      --success:#34d399;
+      --warn:#f59e0b;
+      --danger:#fb7185;
+      --shadow:0 30px 90px rgba(0,0,0,.42);
+      --radius:24px;
+      --radius-sm:16px;
+      --mono:'JetBrains Mono', monospace;
+      --body:'DM Sans', Inter, system-ui, sans-serif;
+      --display:Inter, system-ui, sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:var(--body);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 10% 10%, rgba(139,92,246,.20), transparent 55%),
+        radial-gradient(900px 700px at 90% 20%, rgba(34,211,238,.12), transparent 50%),
+        radial-gradient(1000px 800px at 60% 95%, rgba(245,158,11,.10), transparent 55%),
+        linear-gradient(180deg, #04060f 0%, #060b16 48%, #04060f 100%);
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      pointer-events:none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size:60px 60px;
+      mask-image:radial-gradient(circle at center, black 20%, transparent 90%);
+      opacity:.55;
+    }
+
+    .shell{
+      position:relative;
+      width:min(1500px, calc(100% - 32px));
+      margin:16px auto 28px;
+      display:grid;
+      grid-template-columns: 290px minmax(0,1fr) 330px;
+      gap:18px;
+      align-items:start;
+    }
+
+    .glass{
+      background:var(--panel);
+      border:1px solid var(--stroke);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(22px) saturate(1.4);
+      -webkit-backdrop-filter: blur(22px) saturate(1.4);
+      border-radius:var(--radius);
+    }
+
+    .sidebar{
+      position:sticky; top:16px;
+      padding:18px;
+      overflow:hidden;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      padding:6px 2px 18px;
+      border-bottom:1px solid var(--stroke);
+      margin-bottom:18px;
+    }
+    .brand-mark{
+      width:44px; height:44px; border-radius:14px;
+      display:grid; place-items:center;
+      background:linear-gradient(135deg, rgba(139,92,246,.24), rgba(34,211,238,.16));
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.03) inset;
+      font-size:20px;
+    }
+    .brand h1{margin:0; font-size:16px; line-height:1.1; font-weight:800; letter-spacing:-.03em}
+    .brand p{margin:3px 0 0; color:var(--muted); font-size:12px}
+
+    .nav-group{display:grid; gap:8px; margin-bottom:16px}
+    .nav-btn{
+      width:100%; border:1px solid transparent; outline:none; cursor:pointer;
+      text-align:left; color:var(--text); border-radius:16px; padding:12px 14px;
+      background:rgba(255,255,255,.03);
+      display:flex; align-items:center; gap:12px;
+      transition:.22s ease;
+    }
+    .nav-btn:hover{background:rgba(255,255,255,.055); border-color:var(--stroke)}
+    .nav-btn.active{
+      background:linear-gradient(135deg, rgba(139,92,246,.18), rgba(34,211,238,.10));
+      border-color:rgba(139,92,246,.28);
+      box-shadow:0 10px 30px rgba(139,92,246,.08);
+    }
+    .nav-ic{width:34px; height:34px; border-radius:12px; display:grid; place-items:center; background:rgba(255,255,255,.05); border:1px solid var(--stroke)}
+    .nav-txt{display:flex; flex-direction:column}
+    .nav-txt b{font-size:14px}
+    .nav-txt span{font-size:12px; color:var(--muted)}
+
+    .mini-card{
+      margin-top:14px; padding:14px; border-radius:18px;
+      background:rgba(255,255,255,.035); border:1px solid var(--stroke);
+    }
+    .mini-title{font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.12em; font-family:var(--mono)}
+    .mini-value{font-size:26px; font-weight:900; margin-top:6px; letter-spacing:-.04em}
+    .mini-sub{font-size:12px; color:var(--muted); margin-top:2px}
+    .progress-line{height:10px; border-radius:999px; background:rgba(255,255,255,.06); overflow:hidden; margin-top:12px}
+    .progress-line > div{height:100%; width:0%; border-radius:inherit; background:linear-gradient(90deg, var(--accent), var(--accent-2)); transition:width .45s cubic-bezier(.2,.8,.2,1)}
+
+    .main{
+      min-width:0;
+      display:grid;
+      gap:18px;
+    }
+
+    .hero{
+      padding:22px 24px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero::after{
+      content:""; position:absolute; inset:auto -100px -120px auto;
+      width:420px; height:420px; border-radius:50%;
+      background:radial-gradient(circle, rgba(139,92,246,.20), transparent 64%);
+      filter:blur(8px);
+      pointer-events:none;
+    }
+    .topbar{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:18px;
+    }
+    .eyebrow{
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+      color:rgba(34,211,238,.98); font-family:var(--mono);
+      background:rgba(34,211,238,.08); border:1px solid rgba(34,211,238,.18);
+      padding:7px 12px; border-radius:999px;
+    }
+    .eyebrow::before{content:""; width:7px; height:7px; border-radius:50%; background:currentColor; box-shadow:0 0 14px currentColor}
+
+    .hero h2{
+      margin:14px 0 10px;
+      font-size:clamp(34px, 4.8vw, 62px);
+      line-height:1.0;
+      letter-spacing:-.06em;
+    }
+    .hero h2 .grad{
+      background:linear-gradient(135deg, #fff 0%, #c4b5fd 35%, #67e8f9 72%, #fde68a 100%);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .hero p{
+      margin:0; max-width:820px; color:var(--muted); font-size:16px; line-height:1.65;
+    }
+
+    .hero-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:20px}
+    .btn{
+      border:1px solid var(--stroke); color:var(--text); cursor:pointer;
+      background:rgba(255,255,255,.04);
+      padding:11px 14px; border-radius:14px; font-weight:700; font-size:13px;
+      transition:.2s ease;
+    }
+    .btn:hover{transform:translateY(-1px); border-color:var(--stroke-strong); background:rgba(255,255,255,.07)}
+    .btn.primary{
+      background:linear-gradient(135deg, rgba(139,92,246,.9), rgba(34,211,238,.8));
+      border-color:transparent;
+      box-shadow:0 16px 40px rgba(139,92,246,.2);
+    }
+
+    .stats-grid{
+      display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px;
+    }
+    .stat{
+      padding:16px; border-radius:22px; background:rgba(255,255,255,.035); border:1px solid var(--stroke);
+      min-height:110px; position:relative; overflow:hidden;
+    }
+    .stat::before{
+      content:""; position:absolute; inset:0;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), transparent 55%);
+      pointer-events:none;
+    }
+    .stat-label{font-size:12px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; font-family:var(--mono)}
+    .stat-value{margin-top:10px; font-size:30px; font-weight:900; letter-spacing:-.05em}
+    .stat-sub{margin-top:4px; font-size:12px; color:var(--muted)}
+
+    .content-card{
+      padding:18px;
+      border-radius:var(--radius);
+      background:var(--panel);
+      border:1px solid var(--stroke);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(22px) saturate(1.4);
+      -webkit-backdrop-filter: blur(22px) saturate(1.4);
+    }
+    .section-head{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px;
+    }
+    .section-title{
+      font-size:13px; color:var(--muted);
+      text-transform:uppercase; letter-spacing:.14em; font-family:var(--mono);
+      display:flex; align-items:center; gap:10px;
+    }
+    .section-title::after{content:""; width:64px; height:1px; background:linear-gradient(90deg, rgba(255,255,255,.22), transparent)}
+    .section-tools{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+
+    .search{
+      width:min(340px, 100%); display:flex; align-items:center; gap:10px;
+      background:rgba(255,255,255,.04); border:1px solid var(--stroke);
+      border-radius:14px; padding:10px 12px;
+    }
+    .search input{
+      width:100%; border:none; outline:none; background:transparent; color:var(--text); font-size:14px;
+    }
+    .search input::placeholder{color:var(--muted-2)}
+
+    .phase-switch{display:flex; gap:8px; flex-wrap:wrap}
+    .chip{
+      border:1px solid var(--stroke); background:rgba(255,255,255,.03); color:var(--text);
+      border-radius:999px; padding:10px 12px; cursor:pointer; font-weight:700; font-size:13px;
+      transition:.2s ease;
+    }
+    .chip.active{background:rgba(139,92,246,.16); border-color:rgba(139,92,246,.3)}
+    .chip small{display:block; font-weight:500; color:var(--muted); font-size:11px; margin-top:2px}
+
+    .task-grid{display:grid; gap:14px}
+    .task-card{
+      border-radius:22px; background:rgba(255,255,255,.035); border:1px solid var(--stroke);
+      overflow:hidden; transition:.22s ease;
+    }
+    .task-card:hover{border-color:var(--stroke-strong); transform:translateY(-1px)}
+    .task-card.open{background:rgba(255,255,255,.05)}
+    .task-head{
+      display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center;
+      padding:16px;
+      cursor:pointer;
+    }
+    .accent-bar{width:4px; height:42px; border-radius:999px; background:var(--accent)}
+    .task-meta b{display:block; font-size:16px; margin-bottom:4px}
+    .task-meta span{font-size:12px; color:var(--muted); font-family:var(--mono)}
+    .task-toggle{
+      width:34px; height:34px; display:grid; place-items:center; border-radius:12px;
+      border:1px solid var(--stroke); background:rgba(255,255,255,.03); color:var(--muted); transition:.2s ease;
+    }
+    .task-card.open .task-toggle{transform:rotate(180deg); color:var(--text)}
+    .task-body{display:none; padding:0 16px 16px}
+    .task-card.open .task-body{display:block}
+    .task-progress{height:4px; background:rgba(255,255,255,.06)}
+    .task-progress > div{height:100%; width:0%; background:linear-gradient(90deg, var(--accent), var(--accent-2)); transition:width .35s ease}
+
+    .task-list{display:grid; gap:8px; padding-top:14px}
+    .task-item{
+      display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:start;
+      padding:12px 12px; border-radius:16px; background:rgba(255,255,255,.03); border:1px solid transparent;
+      transition:.18s ease; cursor:pointer;
+    }
+    .task-item:hover{background:rgba(255,255,255,.05); border-color:var(--stroke)}
+    .task-item.done{opacity:.56}
+    .task-item.done .task-title{text-decoration:line-through; color:var(--muted-2)}
+    .check{
+      width:20px; height:20px; border-radius:7px; border:1.5px solid rgba(255,255,255,.22);
+      display:grid; place-items:center; flex:none; margin-top:2px;
+    }
+    .task-item.done .check{background:var(--accent); border-color:transparent}
+    .task-item.done .check::after{
+      content:""; width:6px; height:10px; border-right:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(40deg) translate(-1px,-1px);
+      display:block;
+    }
+    .task-text{min-width:0}
+    .task-title{font-size:14px; line-height:1.45; font-weight:600}
+    .task-note{font-size:12px; color:var(--muted); margin-top:4px; line-height:1.45}
+    .task-tag{font-size:11px; color:var(--muted); font-family:var(--mono); white-space:nowrap; margin-top:2px}
+
+    .grid-2{display:grid; grid-template-columns:1.12fr .88fr; gap:18px}
+
+    .panel-title{margin:0 0 12px; font-size:18px; letter-spacing:-.03em}
+    .panel-sub{margin:0 0 16px; color:var(--muted); font-size:14px; line-height:1.6}
+
+    .target-grid{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px}
+    .target{
+      padding:14px; border-radius:18px; background:rgba(255,255,255,.035); border:1px solid var(--stroke);
+    }
+    .target b{display:block; font-size:26px; letter-spacing:-.05em}
+    .target span{font-size:12px; color:var(--muted)}
+
+    .streak-box,.heatmap-box,.insight-box,.notes-box{padding:18px; border-radius:var(--radius); background:var(--panel); border:1px solid var(--stroke); box-shadow:var(--shadow)}
+    .streak-bar{height:14px; border-radius:999px; background:rgba(255,255,255,.06); overflow:hidden; margin:12px 0 8px}
+    .streak-bar > div{height:100%; width:0%; background:linear-gradient(90deg, var(--success), var(--accent-2)); border-radius:inherit; transition:width .4s ease}
+    .streak-row{display:flex; justify-content:space-between; gap:10px; align-items:center}
+    .streak-count{font-size:34px; font-weight:900; letter-spacing:-.05em}
+    .streak-label{color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.14em; font-family:var(--mono)}
+
+    .week-strip{display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-top:14px}
+    .day-cell{
+      aspect-ratio:1; border-radius:14px; border:1px solid var(--stroke); background:rgba(255,255,255,.03);
+      display:grid; place-items:center; color:var(--muted); position:relative; overflow:hidden; cursor:pointer;
+      transition:.2s ease;
+    }
+    .day-cell:hover{transform:translateY(-1px); border-color:var(--stroke-strong)}
+    .day-cell.done{color:#fff; border-color:rgba(255,255,255,.12)}
+    .day-cell.done::before{
+      content:""; position:absolute; inset:0;
+      background:linear-gradient(135deg, rgba(16,185,129,.9), rgba(34,211,238,.85));
+      opacity:.86;
+    }
+    .day-cell > span{position:relative; z-index:1; font-weight:800; font-size:13px}
+    .day-cell small{position:absolute; bottom:7px; right:7px; z-index:1; font-size:10px; opacity:.78; font-family:var(--mono)}
+
+    .heatmap-wrap{margin-top:10px}
+    .heatmap-meta{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px; flex-wrap:wrap}
+    .legend{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:12px}
+    .legend-sample{width:12px; height:12px; border-radius:3px; background:rgba(255,255,255,.08); border:1px solid var(--stroke)}
+    .heatmap{display:grid; grid-auto-flow:column; grid-template-rows:repeat(7, 1fr); gap:6px; overflow:auto; padding-bottom:6px}
+    .heat-cell{
+      width:15px; height:15px; border-radius:4px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.04);
+      cursor:pointer; position:relative;
+    }
+    .heat-cell[data-level="1"]{background:rgba(34,211,238,.26)}
+    .heat-cell[data-level="2"]{background:rgba(34,211,238,.46)}
+    .heat-cell[data-level="3"]{background:rgba(34,211,238,.68)}
+    .heat-cell[data-level="4"]{background:rgba(34,211,238,.96)}
+    .heat-cell:hover{outline:1px solid rgba(255,255,255,.18)}
+
+    .insight-list{display:grid; gap:10px; margin-top:10px}
+    .insight{
+      padding:12px 14px; border-radius:16px; background:rgba(255,255,255,.035); border:1px solid var(--stroke);
+      display:flex; gap:12px; align-items:flex-start;
+    }
+    .insight .dot{width:10px; height:10px; border-radius:50%; margin-top:5px; background:var(--accent)}
+    .insight b{display:block; font-size:13px; margin-bottom:3px}
+    .insight p{margin:0; font-size:12px; color:var(--muted); line-height:1.55}
+
+    .notes textarea{
+      width:100%; min-height:120px; resize:vertical;
+      border-radius:18px; border:1px solid var(--stroke);
+      background:rgba(255,255,255,.03); color:var(--text);
+      padding:14px; font-family:var(--body); font-size:14px; outline:none;
+    }
+    .notes textarea::placeholder{color:var(--muted-2)}
+
+    .footer-tools{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+
+    .rightcol{
+      position:sticky; top:16px;
+      display:grid; gap:18px;
+    }
+
+    .checkin{
+      padding:18px;
+    }
+    .checkin-row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px}
+    .select, .input{
+      width:100%; border:1px solid var(--stroke); background:rgba(255,255,255,.03);
+      color:var(--text); border-radius:14px; padding:11px 12px; outline:none; font:inherit;
+    }
+    .small-note{font-size:12px; color:var(--muted); line-height:1.55; margin-top:10px}
+
+    .timeline{display:grid; gap:10px}
+    .timeline-item{padding:14px; border-radius:18px; background:rgba(255,255,255,.035); border:1px solid var(--stroke)}
+    .timeline-item b{display:block; margin-bottom:4px; font-size:14px}
+    .timeline-item span{font-size:12px; color:var(--muted); line-height:1.5}
+
+    .modal{
+      position:fixed; inset:0; display:none; place-items:center; z-index:100;
+      background:rgba(0,0,0,.56); backdrop-filter: blur(14px);
+      padding:20px;
+    }
+    .modal.show{display:grid}
+    .modal-card{width:min(720px, 100%); padding:18px}
+    .modal-top{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px}
+    .modal-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .modal-grid .mini{padding:14px; border-radius:18px; background:rgba(255,255,255,.035); border:1px solid var(--stroke)}
+    .modal-grid .mini b{display:block; font-size:18px; margin-bottom:4px}
+    .modal-grid .mini span{font-size:12px; color:var(--muted)}
+
+    .toast{
+      position:fixed; right:20px; bottom:20px; z-index:120;
+      background:rgba(11,16,28,.94); border:1px solid var(--stroke);
+      padding:12px 14px; border-radius:14px; box-shadow:var(--shadow);
+      display:flex; align-items:center; gap:10px; transform:translateY(20px); opacity:0; pointer-events:none;
+      transition:.25s ease;
+    }
+    .toast.show{transform:translateY(0); opacity:1}
+    .toast-dot{width:9px; height:9px; border-radius:50%}
+
+    .hide{display:none !important}
+
+    @media (max-width: 1280px){
+      .shell{grid-template-columns: 280px minmax(0,1fr);}
+      .rightcol{grid-column:1 / -1; position:static; grid-template-columns:repeat(2, minmax(0,1fr));}
+    }
+    @media (max-width: 980px){
+      .shell{grid-template-columns:1fr; width:min(100% - 20px, 1200px)}
+      .sidebar,.rightcol{position:static}
+      .rightcol{grid-template-columns:1fr}
+      .stats-grid,.grid-2,.modal-grid,.target-grid{grid-template-columns:1fr}
+    }
+    @media (max-width: 640px){
+      .hero{padding:18px}
+      .content-card,.streak-box,.heatmap-box,.insight-box,.notes-box,.checkin,.modal-card{padding:14px}
+      .topbar{flex-direction:column}
+      .stats-grid{grid-template-columns:1fr 1fr}
+      .task-head{grid-template-columns:auto 1fr;}
+      .task-toggle{display:none}
+      .task-item{grid-template-columns:auto 1fr}
+      .task-tag{grid-column:2}
+      .section-head{flex-direction:column; align-items:flex-start}
+      .search{width:100%}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar glass">
+      <div class="brand">
+        <div class="brand-mark">◉</div>
+        <div>
+          <h1>Cognitive Rebuild</h1>
+          <p>Pranav’s daily operating system</p>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <button class="nav-btn active" data-view="dashboard">
+          <div class="nav-ic">⌂</div>
+          <div class="nav-txt"><b>Dashboard</b><span>Tasks, streak, progress</span></div>
+        </button>
+        <button class="nav-btn" data-view="heatmap">
+          <div class="nav-ic">▦</div>
+          <div class="nav-txt"><b>Heatmap</b><span>Consistency over time</span></div>
+        </button>
+        <button class="nav-btn" data-view="insights">
+          <div class="nav-ic">◌</div>
+          <div class="nav-txt"><b>Insights</b><span>Patterns and signals</span></div>
+        </button>
+        <button class="nav-btn" data-view="notes">
+          <div class="nav-ic">✎</div>
+          <div class="nav-txt"><b>Notes</b><span>Reflection and review</span></div>
+        </button>
+      </div>
+
+      <div class="mini-card">
+        <div class="mini-title">Current streak</div>
+        <div class="mini-value" id="sidebarStreak">0</div>
+        <div class="mini-sub">days in a row</div>
+        <div class="progress-line"><div id="sidebarProgress"></div></div>
+      </div>
+
+      <div class="mini-card">
+        <div class="mini-title">Focus score</div>
+        <div class="mini-value" id="focusScore">0%</div>
+        <div class="mini-sub">today’s completion rate</div>
+      </div>
+
+      <div class="mini-card">
+        <div class="mini-title">Controls</div>
+        <div class="footer-tools">
+          <button class="btn" id="exportBtn">Export</button>
+          <button class="btn" id="resetBtn">Reset</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="hero glass">
+        <div class="topbar">
+          <div>
+            <div class="eyebrow">Premium daily OS · persistent · customizable</div>
+            <h2>Rewire your brain.<br><span class="grad">Reclaim your edge.</span></h2>
+            <p>
+              A redesigned productivity system with phase switching, full task tracking, daily streaks, a contribution heatmap, notes, focus check-ins, and insight panels.
+              Built to feel like a premium product, not a plain checklist.
+            </p>
+            <div class="hero-actions">
+              <button class="btn primary" id="markDayComplete">Mark today complete</button>
+              <button class="btn" id="openStats">View summary</button>
+              <button class="btn" id="importBtn">Import</button>
+            </div>
+          </div>
+          <div style="min-width:240px;max-width:300px;align-self:stretch;display:grid;gap:12px">
+            <div class="content-card" style="padding:14px">
+              <div class="section-title" style="margin-bottom:10px">Today</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+                <div>
+                  <div style="font-size:28px;font-weight:900;letter-spacing:-.05em" id="todayDate">—</div>
+                  <div style="font-size:12px;color:var(--muted)" id="todayDay">—</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-family:var(--mono)">Phase</div>
+                  <div style="font-size:28px;font-weight:900;letter-spacing:-.05em" id="phaseBadge">1</div>
+                </div>
+              </div>
+            </div>
+            <div class="content-card" style="padding:14px">
+              <div class="section-title" style="margin-bottom:10px">Productivity ring</div>
+              <svg viewBox="0 0 120 120" width="100%" height="100%" aria-label="Progress ring">
+                <defs>
+                  <linearGradient id="ringGrad" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="var(--accent)"/>
+                    <stop offset="100%" stop-color="var(--accent-2)"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="60" cy="60" r="44" stroke="rgba(255,255,255,.08)" stroke-width="14" fill="none"/>
+                <circle id="ring" cx="60" cy="60" r="44" stroke="url(#ringGrad)" stroke-width="14" fill="none" stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="276.46" stroke-dashoffset="276.46"/>
+                <text x="60" y="58" text-anchor="middle" fill="white" font-size="24" font-weight="900" id="ringPct">0%</text>
+                <text x="60" y="78" text-anchor="middle" fill="rgba(245,247,255,.60)" font-size="10" font-family="JetBrains Mono, monospace">COMPLETION</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <div class="stat"><div class="stat-label">Tasks done</div><div class="stat-value" id="statDone">0</div><div class="stat-sub">of all visible tasks</div></div>
+        <div class="stat"><div class="stat-label">Streak</div><div class="stat-value" id="statStreak">0</div><div class="stat-sub">consecutive days</div></div>
+        <div class="stat"><div class="stat-label">Phase</div><div class="stat-value" id="statPhase">1</div><div class="stat-sub">current training layer</div></div>
+        <div class="stat"><div class="stat-label">Momentum</div><div class="stat-value" id="statMomentum">0%</div><div class="stat-sub">today’s completion</div></div>
+      </section>
+
+      <section class="content-card" id="dashboardView">
+        <div class="section-head">
+          <div class="section-title">Phase control</div>
+          <div class="section-tools">
+            <div class="search"><span style="color:var(--muted)">⌕</span><input id="searchInput" placeholder="Search tasks, notes, sections…" /></div>
+          </div>
+        </div>
+        <div class="phase-switch" id="phaseSwitch"></div>
+        <div class="task-grid" id="taskGrid" style="margin-top:16px"></div>
+      </section>
+
+      <section class="grid-2" id="lowerGrid">
+        <div class="content-card">
+          <div class="section-head">
+            <div class="section-title">Weekly targets</div>
+            <button class="btn" id="shuffleTip">Refresh insight</button>
+          </div>
+          <h3 class="panel-title">Targets that actually matter</h3>
+          <p class="panel-sub">These are the metrics that keep the system honest: output, consistency, recovery, and review.</p>
+          <div class="target-grid" id="targetGrid"></div>
+        </div>
+
+        <div class="streak-box">
+          <div class="section-head">
+            <div class="section-title">Streak tracker</div>
+            <div class="section-tools"><span class="legend"><span class="legend-sample" style="background:linear-gradient(90deg,var(--success),var(--accent-2))"></span> live week</span></div>
+          </div>
+          <h3 class="panel-title">Keep the chain alive</h3>
+          <p class="panel-sub">Tap any day to log completion. The streak also drives the heatmap and summary cards.</p>
+          <div class="streak-row">
+            <div>
+              <div class="streak-count" id="streakCount">0</div>
+              <div class="streak-label">days this week</div>
+            </div>
+            <div style="text-align:right">
+              <div class="streak-label">Best streak</div>
+              <div style="font-size:22px;font-weight:900;letter-spacing:-.04em" id="bestStreak">0</div>
+            </div>
+          </div>
+          <div class="streak-bar"><div id="streakBar"></div></div>
+          <div class="week-strip" id="weekStrip"></div>
+        </div>
+      </section>
+
+      <section class="grid-2" id="heatmapView">
+        <div class="heatmap-box">
+          <div class="section-head">
+            <div class="section-title">Contribution heatmap</div>
+            <div class="section-tools">
+              <span class="legend"><span class="legend-sample"></span> low</span>
+              <span class="legend"><span class="legend-sample" style="background:rgba(34,211,238,.96)"></span> high</span>
+            </div>
+          </div>
+          <h3 class="panel-title">Consistency over the last 12 weeks</h3>
+          <p class="panel-sub">This visual fills automatically from your daily completions. Dark means nothing logged, brighter means stronger participation.</p>
+          <div class="heatmap-wrap">
+            <div class="heatmap" id="heatmap"></div>
+          </div>
+        </div>
+
+        <div class="insight-box">
+          <div class="section-head"><div class="section-title">Insights</div></div>
+          <h3 class="panel-title">System feedback</h3>
+          <p class="panel-sub">These are live calculations from your activity, streak, and review discipline.</p>
+          <div class="insight-list" id="insights"></div>
+        </div>
+      </section>
+
+      <section class="notes-box" id="notesView">
+        <div class="section-head"><div class="section-title">Notes + review</div></div>
+        <h3 class="panel-title">Daily reflection</h3>
+        <p class="panel-sub">Write the one thing that mattered today, one mistake, and one action for tomorrow.</p>
+        <div class="notes">
+          <textarea id="notesInput" placeholder="Today I learned…\nI got stuck on…\nTomorrow I will…"></textarea>
+        </div>
+        <div class="footer-tools">
+          <button class="btn primary" id="saveNotes">Save notes</button>
+          <button class="btn" id="clearNotes">Clear notes</button>
+        </div>
+      </section>
+    </main>
+
+    <aside class="rightcol">
+      <section class="checkin glass">
+        <div class="section-head"><div class="section-title">Check-in</div></div>
+        <h3 class="panel-title">How focused are you today?</h3>
+        <div class="checkin-row">
+          <select id="energySelect" class="select">
+            <option value="5">Energy: high</option>
+            <option value="4">Energy: good</option>
+            <option value="3">Energy: okay</option>
+            <option value="2">Energy: low</option>
+            <option value="1">Energy: very low</option>
+          </select>
+          <select id="moodSelect" class="select">
+            <option value="5">Mood: excellent</option>
+            <option value="4">Mood: good</option>
+            <option value="3">Mood: neutral</option>
+            <option value="2">Mood: off</option>
+            <option value="1">Mood: rough</option>
+          </select>
+        </div>
+        <div class="checkin-row">
+          <input id="waterInput" class="input" type="number" min="0" max="10" step="0.1" placeholder="Water today (L)" />
+          <input id="sleepInput" class="input" type="number" min="0" max="16" step="0.5" placeholder="Sleep (hrs)" />
+        </div>
+        <div class="footer-tools">
+          <button class="btn primary" id="saveCheckin">Save check-in</button>
+        </div>
+        <div class="small-note">The point is not perfection. The point is that the dashboard becomes honest enough to guide you.</div>
+      </section>
+
+      <section class="timeline glass">
+        <div class="section-head"><div class="section-title">Built-in upgrades</div></div>
+        <h3 class="panel-title">Extra features added</h3>
+        <div class="timeline">
+          <div class="timeline-item"><b>Persistent local storage</b><span>Your tasks, streak, notes, and check-ins survive refreshes.</span></div>
+          <div class="timeline-item"><b>Search + phase switching</b><span>Quickly find content and move across the three training phases.</span></div>
+          <div class="timeline-item"><b>Heatmap + insights</b><span>Track consistency over 12 weeks with automatic feedback.</span></div>
+          <div class="timeline-item"><b>Export / import</b><span>Backup or migrate your full state in one click.</span></div>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <div class="modal" id="statsModal" role="dialog" aria-modal="true">
+    <div class="modal-card glass">
+      <div class="modal-top">
+        <div>
+          <div class="section-title">Summary</div>
+          <h3 class="panel-title" style="margin-bottom:0">Snapshot of your system</h3>
+        </div>
+        <button class="btn" id="closeStats">Close</button>
+      </div>
+      <div class="modal-grid">
+        <div class="mini"><b id="modalTasks">0</b><span>tasks completed today</span></div>
+        <div class="mini"><b id="modalRate">0%</b><span>completion rate</span></div>
+        <div class="mini"><b id="modalStreak">0</b><span>current streak</span></div>
+        <div class="mini"><b id="modalBest">0</b><span>best streak</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><div class="toast-dot" id="toastDot"></div><div id="toastText">Saved</div></div>
+
+  <input type="file" id="importFile" accept="application/json" class="hide" />
+
+  <script>
+    const APP_KEY = 'cognitive_rebuild_premium_v1';
+    const phaseData = {
+      1: {
+        color: '#22d3ee',
+        label: 'Foundation',
+        sub: 'Weeks 1–4',
+        weekly: [
+          {n:'7', l:'DSA problems'},
+          {n:'5', l:'N-back sessions'},
+          {n:'3', l:'Learning blocks'},
+          {n:'5', l:'Sleep by target'}
+        ],
+        tasks: [
+          {title:'Wake-up protocol', time:'5:30 – 6:00 AM', icon:'☀️', items:[
+            ['No phone for the first 60 minutes', 'Keep the phone outside the bedroom.'],
+            ['Drink 500ml water immediately on waking', 'Build the cue before the input loop starts.'],
+            ['10-min outdoor walk without earphones', 'Sunlight + movement = cleaner start.'],
+            ['Grayscale the phone', 'Reduce visual reward density.']
+          ]},
+          {title:'Deep work block', time:'6:00 – 8:30 AM', icon:'🧠', items:[
+            ['1 easy LeetCode problem', 'No hints for the first 30 minutes.'],
+            ['3 × 25-minute focus sprints', 'Single tab only.'],
+            ['5-minute retrieval write after each sprint', 'Recall from memory, not notes.'],
+            ['Record one lesson in a problem journal', 'One line is enough.']
+          ]},
+          {title:'Learning + cognitive training', time:'2:00 – 4:30 PM', icon:'📚', items:[
+            ['15-minute Dual N-Back session', 'Keep it consistent, not heroic.'],
+            ['1 Odin Project lesson or project task', 'Type the examples yourself.'],
+            ['20 pages of a hard book', 'Read to understand, not to finish.'],
+            ['20 minutes of core subject recall', 'Close notes and answer from memory.']
+          ]},
+          {title:'Consolidation + review', time:'7:00 – 9:30 PM', icon:'🌆', items:[
+            ['Re-code today’s DSA solution from scratch', 'No looking. No cheating.'],
+            ['Log one hard win from today', 'Make the identity visible.'],
+            ['30-minute subject revision', 'Active recall only.']
+          ]},
+          {title:'Wind-down & sleep prep', time:'10:00 – 10:45 PM', icon:'🌙', items:[
+            ['No social media after 10 PM', 'Protect the sleep window.'],
+            ['10-min breathing or stretching', 'Lower arousal before bed.'],
+            ['Lights out by 10:45 PM', 'Sleep is a performance multiplier.']
+          ]}
+        ]
+      },
+      2: {
+        color: '#8b5cf6',
+        label: 'Build',
+        sub: 'Weeks 5–10',
+        weekly: [
+          {n:'10', l:'DSA problems'},
+          {n:'5', l:'N-back sessions'},
+          {n:'2', l:'Project features'},
+          {n:'5', l:'Nights on time'}
+        ],
+        tasks: [
+          {title:'Wake-up protocol', time:'5:30 – 6:00 AM', icon:'☀️', items:[
+            ['No phone for 60 minutes', 'Identity-level habit now.'],
+            ['Water + light stretching', 'Increase movement early.'],
+            ['Name your hardest task first', 'Decide before input.']
+          ]},
+          {title:'Deep work block', time:'6:00 – 8:45 AM', icon:'🧠', items:[
+            ['1 medium LeetCode problem', 'Trees, DP, graphs, or similar.'],
+            ['3 × 45-minute sprints', 'Increase the load gradually.'],
+            ['Ship one concrete project feature', 'Small, finished, visible.'],
+            ['Explain your approach aloud', 'Teaching-level recall.']
+          ]},
+          {title:'Learning + cognitive training', time:'2:00 – 4:45 PM', icon:'📚', items:[
+            ['20-minute Dual N-Back', 'Push consistency before difficulty.'],
+            ['1 CS core chapter with active notes', 'OS / DBMS / CN.'],
+            ['20+ pages of hard reading', 'Track the argument.']
+          ]},
+          {title:'Consolidation + design study', time:'7:00 – 9:30 PM', icon:'🌆', items:[
+            ['Re-solve today’s problem timed', 'Build retention.'],
+            ['1 LLD pattern or case study', 'SOLID, Factory, Observer, Strategy.'],
+            ['Write a win + improvement', 'Self-correction without self-attack.']
+          ]},
+          {title:'Wind-down & planning', time:'9:45 – 10:30 PM', icon:'🌙', items:[
+            ['Decide tomorrow’s DSA problem tonight', 'Remove decision friction.'],
+            ['Phone DND by 10 PM', 'Hard boundary.'],
+            ['Sleep by 10:30 PM', 'Earlier target.']
+          ]}
+        ]
+      },
+      3: {
+        color: '#f59e0b',
+        label: 'Peak',
+        sub: 'Week 11+',
+        weekly: [
+          {n:'12', l:'DSA problems'},
+          {n:'3', l:'N-back sessions'},
+          {n:'3', l:'Mock interviews'},
+          {n:'5', l:'On-time nights'}
+        ],
+        tasks: [
+          {title:'Wake-up protocol', time:'5:30 – 6:00 AM', icon:'☀️', items:[
+            ['No phone for 60 minutes', 'You are now enforcing the standard.'],
+            ['20-minute morning run', 'Use the early energy channel.'],
+            ['Name the hardest problem today', 'Start with the real thing.']
+          ]},
+          {title:'Deep work block', time:'6:00 – 9:00 AM', icon:'🧠', items:[
+            ['Hard LeetCode / system design problem', '60 minutes before hints.'],
+            ['Single 60–90 minute flow block', 'No need to fragment.'],
+            ['LLD / system design end-to-end', 'Whiteboard before coding.']
+          ]},
+          {title:'Interview prep + maintenance', time:'2:00 – 4:30 PM', icon:'📚', items:[
+            ['20-minute N-Back maintenance', 'Less volume, sustained output.'],
+            ['Mock interview questions out loud', 'Answer as if live.'],
+            ['30 pages of dense reading', 'Keep the mind elastic.']
+          ]},
+          {title:'Mock interviews + portfolio', time:'7:00 – 9:30 PM', icon:'🌆', items:[
+            ['45-minute mock interview', 'DSA + CS subject.'],
+            ['Weekly wins-log review', 'See the compounding effect.'],
+            ['Resume / GitHub polish', 'Keep the system shippable.']
+          ]},
+          {title:'Wind-down + reflection', time:'9:45 – 10:30 PM', icon:'🌙', items:[
+            ['Phone DND by 10 PM', 'Absolute boundary.'],
+            ['Plan tomorrow’s mock question', 'Reduce morning friction.'],
+            ['2-minute identity reflection', 'Who did I become today?']
+          ]}
+        ]
+      }
+    };
+
+    const state = loadState();
+    const els = {
+      phaseSwitch: document.getElementById('phaseSwitch'),
+      taskGrid: document.getElementById('taskGrid'),
+      targetGrid: document.getElementById('targetGrid'),
+      weekStrip: document.getElementById('weekStrip'),
+      heatmap: document.getElementById('heatmap'),
+      insights: document.getElementById('insights'),
+      searchInput: document.getElementById('searchInput'),
+      notesInput: document.getElementById('notesInput'),
+      energySelect: document.getElementById('energySelect'),
+      moodSelect: document.getElementById('moodSelect'),
+      waterInput: document.getElementById('waterInput'),
+      sleepInput: document.getElementById('sleepInput'),
+      toast: document.getElementById('toast'),
+      toastDot: document.getElementById('toastDot'),
+      toastText: document.getElementById('toastText'),
+      statsModal: document.getElementById('statsModal'),
+      ring: document.getElementById('ring')
+    };
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(APP_KEY);
+        if(!raw) return {
+          phase: 1,
+          completed: {},
+          dayLogs: {},
+          notes: '',
+          checkin: {energy: '5', mood: '5', water:'', sleep:''},
+          bestStreak: 0,
+          focusEntries: {}
+        };
+        const parsed = JSON.parse(raw);
+        return {
+          phase: 1,
+          completed: {},
+          dayLogs: {},
+          notes: '',
+          checkin: {energy: '5', mood: '5', water:'', sleep:''},
+          bestStreak: 0,
+          focusEntries: {},
+          ...parsed
+        };
+      }catch(e){
+        return {phase:1, completed:{}, dayLogs:{}, notes:'', checkin:{energy:'5', mood:'5', water:'', sleep:''}, bestStreak:0, focusEntries:{}};
+      }
+    }
+
+    function saveState(){
+      localStorage.setItem(APP_KEY, JSON.stringify(state));
+    }
+
+    function todayKey(){
+      const d = new Date();
+      return d.toISOString().slice(0,10);
+    }
+
+    function dateLabel(){
+      const d = new Date();
+      document.getElementById('todayDate').textContent = d.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+      document.getElementById('todayDay').textContent = d.toLocaleDateString(undefined, {weekday:'long', year:'numeric'});
+    }
+
+    function taskKey(phase, sectionIndex, taskIndex){
+      return `p${phase}_s${sectionIndex}_t${taskIndex}`;
+    }
+
+    function phaseMeta(){
+      return phaseData[state.phase];
+    }
+
+    function renderPhaseSwitch(){
+      els.phaseSwitch.innerHTML = Object.entries(phaseData).map(([k,v]) => `
+        <button class="chip ${Number(k)===state.phase ? 'active':''}" data-phase="${k}">
+          Phase ${k}
+          <small>${v.sub} · ${v.label}</small>
+        </button>
+      `).join('');
+      els.phaseSwitch.querySelectorAll('[data-phase]').forEach(btn => {
+        btn.onclick = () => setPhase(Number(btn.dataset.phase));
+      });
+    }
+
+    function setPhase(phase){
+      state.phase = phase;
+      saveState();
+      renderAll();
+      showToast(`Phase ${phase} loaded`, phaseMeta().color);
+    }
+
+    function isTaskDone(phase, s, t){
+      return !!state.completed[taskKey(phase,s,t)];
+    }
+
+    function toggleTask(phase, s, t){
+      const key = taskKey(phase,s,t);
+      state.completed[key] = !state.completed[key];
+      const date = todayKey();
+      if(!state.dayLogs[date]) state.dayLogs[date] = 0;
+      state.dayLogs[date] = calculateTodayCount();
+      if(!state.focusEntries[date]) state.focusEntries[date] = {energy:'5', mood:'5', water:'', sleep:''};
+      saveState();
+      renderAll();
+      showToast(state.completed[key] ? 'Task completed' : 'Task unchecked', phaseMeta().color);
+    }
+
+    function todayCompletion(){
+      const meta = phaseMeta();
+      let total = 0, done = 0;
+      meta.tasks.forEach((section, s) => {
+        section.items.forEach((_, t) => {
+          total += 1;
+          if(isTaskDone(state.phase, s, t)) done += 1;
+        });
+      });
+      return {total, done, pct: total ? Math.round((done/total)*100) : 0};
+    }
+
+    function calculateTodayCount(){
+      return todayCompletion().done;
+    }
+
+    function currentWeek(){
+      const today = new Date();
+      const day = (today.getDay() + 6) % 7;
+      const monday = new Date(today);
+      monday.setDate(today.getDate() - day);
+      return Array.from({length:7}, (_,i)=>{
+        const d = new Date(monday);
+        d.setDate(monday.getDate()+i);
+        return d;
+      });
+    }
+
+    function dayKey(d){ return d.toISOString().slice(0,10); }
+
+    function renderWeekStrip(){
+      const days = ['M','T','W','T','F','S','S'];
+      const current = currentWeek();
+      const c = phaseMeta().color;
+      els.weekStrip.innerHTML = current.map((d,i)=>{
+        const k = dayKey(d);
+        const done = !!state.dayLogs[k];
+        const count = state.dayLogs[k] || 0;
+        return `
+          <div class="day-cell ${done ? 'done' : ''}" data-day="${k}" title="${d.toDateString()}">
+            <span>${days[i]}</span>
+            <small>${d.getDate()}</small>
+          </div>
+        `;
+      }).join('');
+      els.weekStrip.querySelectorAll('.day-cell').forEach(cell => {
+        cell.onclick = () => {
+          const k = cell.dataset.day;
+          state.dayLogs[k] = state.dayLogs[k] ? 0 : 1;
+          state.bestStreak = Math.max(state.bestStreak, computeStreak());
+          saveState();
+          renderAll();
+          showToast('Day toggled', c);
+        };
+      });
+      const count = current.filter(d => !!state.dayLogs[dayKey(d)]).length;
+      const pct = Math.round((count/7)*100);
+      document.getElementById('streakCount').textContent = count;
+      document.getElementById('streakBar').style.width = `${pct}%`;
+      document.getElementById('sidebarProgress').style.width = `${pct}%`;
+      document.getElementById('sidebarStreak').textContent = count;
+      document.getElementById('statStreak').textContent = count;
+      document.getElementById('streakBar').style.background = `linear-gradient(90deg, ${c}, #34d399)`;
+    }
+
+    function computeStreak(){
+      const dates = Object.keys(state.dayLogs).filter(k => state.dayLogs[k]).sort();
+      let streak = 0;
+      let cursor = new Date();
+      cursor.setHours(0,0,0,0);
+      while(true){
+        const k = cursor.toISOString().slice(0,10);
+        if(!state.dayLogs[k]) break;
+        streak += 1;
+        cursor.setDate(cursor.getDate()-1);
+      }
+      return streak;
+    }
+
+    function bestStreak(){
+      return Math.max(state.bestStreak || 0, computeStreak());
+    }
+
+    function renderHeatmap(){
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      const days = 84;
+      const cells = [];
+      for(let i=days-1; i>=0; i--){
+        const d = new Date(now);
+        d.setDate(now.getDate()-i);
+        const k = d.toISOString().slice(0,10);
+        const val = state.dayLogs[k] || 0;
+        const level = Math.min(4, val > 0 ? val : 0);
+        cells.push(`<div class="heat-cell" data-level="${level}" title="${k} · ${val ? 'completed' : 'no log'}"></div>`);
+      }
+      els.heatmap.innerHTML = cells.join('');
+    }
+
+    function renderTargets(){
+      const meta = phaseMeta();
+      els.targetGrid.innerHTML = meta.weekly.map(item => `
+        <div class="target">
+          <b>${item.n}</b>
+          <span>${item.l}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderTasks(){
+      const meta = phaseMeta();
+      const q = els.searchInput.value.trim().toLowerCase();
+      const html = meta.tasks.map((section, s) => {
+        const matchSection = section.title.toLowerCase().includes(q) || section.time.toLowerCase().includes(q) || section.items.some(item => item.some(x => x.toLowerCase().includes(q)));
+        if(q && !matchSection) return '';
+        const doneCount = section.items.filter((_, t) => isTaskDone(state.phase, s, t)).length;
+        const pct = Math.round((doneCount/section.items.length)*100);
+        const items = section.items.map((item, t) => {
+          const done = isTaskDone(state.phase, s, t);
+          const [title, note] = item;
+          const termMatch = !q || title.toLowerCase().includes(q) || note.toLowerCase().includes(q);
+          if(q && !termMatch) return '';
+          return `
+            <div class="task-item ${done ? 'done' : ''}" data-task="${state.phase}-${s}-${t}">
+              <div class="check"></div>
+              <div class="task-text">
+                <div class="task-title">${title}</div>
+                <div class="task-note">${note}</div>
+              </div>
+              <div class="task-tag">#${String(t+1).padStart(2,'0')}</div>
+            </div>
+          `;
+        }).join('');
+        if(!items.trim()) return '';
+        return `
+          <article class="task-card ${s===0 ? 'open' : ''}" style="--accent:${meta.color}">
+            <div class="task-head" data-open-card>
+              <div class="accent-bar" style="background:linear-gradient(180deg, ${meta.color}, rgba(255,255,255,.2))"></div>
+              <div class="task-meta">
+                <b>${section.icon} ${section.title}</b>
+                <span>${section.time}</span>
+              </div>
+              <div class="task-toggle">▾</div>
+            </div>
+            <div class="task-progress"><div style="width:${pct}%; background:linear-gradient(90deg, ${meta.color}, var(--accent-2))"></div></div>
+            <div class="task-body">
+              <div class="task-list">${items}</div>
+            </div>
+          </article>
+        `;
+      }).join('');
+      els.taskGrid.innerHTML = html || `<div class="target" style="grid-column:1/-1"><b>No matches found</b><span>Try a different keyword.</span></div>`;
+
+      els.taskGrid.querySelectorAll('[data-open-card]').forEach(head => {
+        head.onclick = () => head.parentElement.classList.toggle('open');
+      });
+      els.taskGrid.querySelectorAll('[data-task]').forEach(row => {
+        row.onclick = () => {
+          const [p,s,t] = row.dataset.task.split('-').map(Number);
+          toggleTask(p,s,t);
+        };
+      });
+    }
+
+    function renderInsights(){
+      const {total, done, pct} = todayCompletion();
+      const streak = computeStreak();
+      const best = bestStreak();
+      const energy = Number(state.checkin?.energy || 5);
+      const mood = Number(state.checkin?.mood || 5);
+      const water = Number(state.checkin?.water || 0);
+      const sleep = Number(state.checkin?.sleep || 0);
+      const compliance = total ? Math.round(((done/total)*0.55 + (Math.min(water/2.5,1)*0.2) + (Math.min(sleep/7.5,1)*0.25))*100) : 0;
+      const items = [
+        {
+          dot: 'var(--success)',
+          title: 'Completion quality',
+          body: `You finished ${done} of ${total} visible tasks today. ${pct}% is the current momentum score.`
+        },
+        {
+          dot: 'var(--accent)',
+          title: 'Streak health',
+          body: `${streak} day${streak===1?'':'s'} in a row. Best streak recorded so far: ${best}.`
+        },
+        {
+          dot: 'var(--warn)',
+          title: 'Recovery signal',
+          body: `Energy ${energy}/5, mood ${mood}/5, water ${water || '—'} L, sleep ${sleep || '—'} hrs.`
+        },
+        {
+          dot: 'var(--accent-2)',
+          title: 'System grade',
+          body: `${compliance}% estimated overall alignment from work, recovery, and routine.`
+        }
+      ];
+      els.insights.innerHTML = items.map(item => `
+        <div class="insight"><div class="dot" style="background:${item.dot}"></div><div><b>${item.title}</b><p>${item.body}</p></div></div>
+      `).join('');
+      updateModalStats();
+    }
+
+    function updateSummary(){
+      const {done, pct} = todayCompletion();
+      document.getElementById('statDone').textContent = done;
+      document.getElementById('statPhase').textContent = state.phase;
+      document.getElementById('phaseBadge').textContent = state.phase;
+      document.getElementById('statMomentum').textContent = `${pct}%`;
+      document.getElementById('focusScore').textContent = `${pct}%`;
+      const ring = document.getElementById('ring');
+      const pctLabel = document.getElementById('ringPct');
+      const r = 44;
+      const circ = 2 * Math.PI * r;
+      const offset = circ - (pct / 100) * circ;
+      ring.style.strokeDasharray = `${circ}`;
+      ring.style.strokeDashoffset = `${offset}`;
+      pctLabel.textContent = `${pct}%`;
+      document.getElementById('statDone').style.color = phaseMeta().color;
+      document.getElementById('statPhase').style.color = phaseMeta().color;
+      document.getElementById('statMomentum').style.color = phaseMeta().color;
+      document.getElementById('bestStreak').textContent = bestStreak();
+      document.getElementById('sidebarStreak').textContent = computeStreak();
+      document.getElementById('sidebarProgress').style.width = `${Math.min(100, Math.round((computeStreak()/7)*100))}%`;
+      document.getElementById('modalTasks').textContent = done;
+      document.getElementById('modalRate').textContent = `${pct}%`;
+      document.getElementById('modalStreak').textContent = computeStreak();
+      document.getElementById('modalBest').textContent = bestStreak();
+      const score = (Number(state.checkin?.energy || 5) + Number(state.checkin?.mood || 5) + (pct/20)) / 3;
+      document.getElementById('focusScore').textContent = `${Math.round((score/5)*100)}%`;
+    }
+
+    function renderNotes(){
+      els.notesInput.value = state.notes || '';
+      if(state.checkin){
+        els.energySelect.value = state.checkin.energy || '5';
+        els.moodSelect.value = state.checkin.mood || '5';
+        els.waterInput.value = state.checkin.water || '';
+        els.sleepInput.value = state.checkin.sleep || '';
+      }
+    }
+
+    function updateModalStats(){
+      const {done, pct} = todayCompletion();
+      document.getElementById('modalTasks').textContent = done;
+      document.getElementById('modalRate').textContent = `${pct}%`;
+      document.getElementById('modalStreak').textContent = computeStreak();
+      document.getElementById('modalBest').textContent = bestStreak();
+    }
+
+    function renderAll(){
+      renderPhaseSwitch();
+      renderTargets();
+      renderTasks();
+      renderWeekStrip();
+      renderHeatmap();
+      renderInsights();
+      updateSummary();
+      renderNotes();
+      saveState();
+    }
+
+    function showToast(text, color){
+      els.toastText.textContent = text;
+      els.toastDot.style.background = color;
+      els.toastDot.style.boxShadow = `0 0 12px ${color}`;
+      els.toast.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=>els.toast.classList.remove('show'), 1800);
+    }
+
+    // Controls
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const view = btn.dataset.view;
+        document.getElementById('dashboardView').scrollIntoView({behavior:'smooth', block:'start'});
+        if(view === 'heatmap') document.getElementById('heatmapView').scrollIntoView({behavior:'smooth', block:'start'});
+        if(view === 'insights') document.getElementById('heatmapView').scrollIntoView({behavior:'smooth', block:'start'});
+        if(view === 'notes') document.getElementById('notesView').scrollIntoView({behavior:'smooth', block:'start'});
+      };
+    });
+
+    document.getElementById('markDayComplete').onclick = () => {
+      const d = todayKey();
+      const current = todayCompletion();
+      if(current.total && current.done < current.total){
+        state.dayLogs[d] = 1;
+        state.bestStreak = Math.max(state.bestStreak || 0, computeStreak());
+        saveState();
+        renderAll();
+        showToast('Today marked complete', phaseMeta().color);
+      } else {
+        showToast('Already complete or no tasks visible', phaseMeta().color);
+      }
+    };
+
+    document.getElementById('openStats').onclick = () => els.statsModal.classList.add('show');
+    document.getElementById('closeStats').onclick = () => els.statsModal.classList.remove('show');
+    els.statsModal.onclick = (e) => { if(e.target === els.statsModal) els.statsModal.classList.remove('show'); };
+
+    document.getElementById('saveNotes').onclick = () => {
+      state.notes = els.notesInput.value;
+      saveState();
+      showToast('Notes saved', phaseMeta().color);
+    };
+    document.getElementById('clearNotes').onclick = () => {
+      state.notes = '';
+      els.notesInput.value = '';
+      saveState();
+      showToast('Notes cleared', phaseMeta().color);
+    };
+
+    document.getElementById('saveCheckin').onclick = () => {
+      state.checkin = {
+        energy: els.energySelect.value,
+        mood: els.moodSelect.value,
+        water: els.waterInput.value,
+        sleep: els.sleepInput.value
+      };
+      const k = todayKey();
+      state.focusEntries[k] = state.checkin;
+      saveState();
+      renderAll();
+      showToast('Check-in saved', phaseMeta().color);
+    };
+
+    document.getElementById('shuffleTip').onclick = () => {
+      const tips = [
+        'Consistency beats intensity. Keep the chain alive.',
+        'The point is not a perfect day; it is not breaking the loop.',
+        'If energy is low, shrink the task — do not disappear.',
+        'Visibility matters. The dashboard should be truthful.',
+        'A clean evening improves tomorrow more than a heroic morning.'
+      ];
+      showToast(tips[Math.floor(Math.random()*tips.length)], phaseMeta().color);
+    };
+
+    document.getElementById('resetBtn').onclick = () => {
+      if(confirm('Reset all saved progress on this device?')){
+        localStorage.removeItem(APP_KEY);
+        location.reload();
+      }
+    };
+
+    document.getElementById('exportBtn').onclick = () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'cognitive-rebuild-backup.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Backup exported', phaseMeta().color);
+    };
+
+    document.getElementById('importBtn').onclick = () => document.getElementById('importFile').click();
+    document.getElementById('importFile').onchange = async (e) => {
+      const file = e.target.files?.[0];
+      if(!file) return;
+      const text = await file.text();
+      try{
+        const parsed = JSON.parse(text);
+        localStorage.setItem(APP_KEY, JSON.stringify({
+          phase: parsed.phase || 1,
+          completed: parsed.completed || {},
+          dayLogs: parsed.dayLogs || {},
+          notes: parsed.notes || '',
+          checkin: parsed.checkin || {energy:'5', mood:'5', water:'', sleep:''},
+          bestStreak: parsed.bestStreak || 0,
+          focusEntries: parsed.focusEntries || {}
+        }));
+        location.reload();
+      }catch(err){
+        alert('Invalid JSON file.');
+      }
+    };
+
+    document.getElementById('searchInput').oninput = () => renderTasks();
+
+    // Init
+    dateLabel();
+    renderAll();
+    const initial = state.phase || 1;
+    setPhase(initial);
+    document.getElementById('todayDate').textContent = new Date().toLocaleDateString(undefined, {month:'short', day:'numeric'});
+    document.getElementById('todayDay').textContent = new Date().toLocaleDateString(undefined, {weekday:'long', year:'numeric'});
+    document.getElementById('phaseBadge').textContent = state.phase;
+    document.getElementById('energySelect').value = state.checkin?.energy || '5';
+    document.getElementById('moodSelect').value = state.checkin?.mood || '5';
+    document.getElementById('waterInput').value = state.checkin?.water || '';
+    document.getElementById('sleepInput').value = state.checkin?.sleep || '';
+
+    // Close modal on escape
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape') els.statsModal.classList.remove('show');
+    });
+  </script>
+</body>
+</html>
